@@ -6,6 +6,15 @@ Python Remote Administration Tools
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+
+     ____  _  _  ____   __  ____
+	(  _ \( \/ )(  _ \ / _\(_  _)
+	 ) __/ )  /  )   //    \ )(
+	(__)  (__/  (__\_)\_/\_/(__) v1.0 (ReztDev)
+
+	Python Remote Administration Tools
+
+
 class SoftwareEngineer:
 
     def __init__(self):
