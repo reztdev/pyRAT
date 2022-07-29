@@ -7,7 +7,7 @@ import argparse
 import subprocess
 
 class setConfig:
-	def __init__(self, localhost, localport):
+	def __init__(self, localhost, localport=4444):
 		try:
 			self.LHOST = localhost
 			self.LPORT = int(localport)
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 	parser.add_argument("-e", "--exploit", dest="exploit", action="store_true", help="Start run exploit and create payload code")
 	parser.add_argument("-t", "--host", dest="host", help="Specify lhost as listener")
 	parser.add_argument("-p", "--port", dest="port", type=int, help="Specify port for listener")
-	parser.add_argument("-w", "--write", dest="output", help="Specify file output payloads")
+	parser.add_argument("-w", "--write", dest="output", help="Specify file output payloads (need opt : -e / --exploit)")
 	parser.add_argument("-v", "--version", dest="version", action='store_true', help="Show version info")
 	args = parser.parse_args()
 
