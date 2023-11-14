@@ -38,7 +38,7 @@ class ExploitAdministration(setConfig):
 			time.sleep(2)
 			while True:
 				try:
-					shell = raw_input("\033[04mshell\033[0m >> ")
+					shell = str(input("\033[04mshell\033[0m >> "))
 
 					if shell.startswith("download") == True:
 						try:
